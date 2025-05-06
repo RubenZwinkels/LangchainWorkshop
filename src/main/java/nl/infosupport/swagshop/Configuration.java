@@ -11,7 +11,7 @@ public class Configuration {
         return AiServices.builder(Assistant.class)
                 .chatModel(OpenAiChatModel.builder()
                         .apiKey("sk-pro-10CIj2oroBwOOuF4h9HytXtMEa0kb85xMb-LQM0ck3ApMgA")
-                        .modelName(OpenAiChatModelName.O3_MINI)
+                        .modelName(OpenAiChatModelName.GPT_4_O)
                         .build())
                 .chatMemory(MessageWindowChatMemory.withMaxMessages(10))
                 .build();
