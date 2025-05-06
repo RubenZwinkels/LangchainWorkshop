@@ -10,7 +10,7 @@ public class Configuration {
     static Assistant assistant() {
         return AiServices.builder(Assistant.class)
                 .chatModel(OpenAiChatModel.builder()
-                        .apiKey("")
+                        .apiKey("sk-pro-10CIj2oroBwOOuF4h9HytXtMEa0kb85xMb-LQM0ck3ApMgA")
                         .modelName(OpenAiChatModelName.O3_MINI)
                         .build())
                 .chatMemory(MessageWindowChatMemory.withMaxMessages(10))
