@@ -25,7 +25,7 @@ LangChain4j is een library dat helpt met het integreren van Artificial Intellige
 > [!NOTE]
 > Clone deze git repository. Deze repository gebruiken we om onze Info Support Swagshop te bouwen.
 
-## Basic integratie met Large Language Model (LLM)
+## Exercise 1: Basic integratie met Large Language Model (LLM)
 
 LangChain4j maakt het beginnen met AI in Java zo simpel als de volgende paar stappen:
 
@@ -35,13 +35,13 @@ LangChain4j maakt het beginnen met AI in Java zo simpel als de volgende paar sta
     <dependency>
         <groupId>dev.langchain4j</groupId>
         <artifactId>langchain4j</artifactId>
-        <version>0.33.0</version>
+        <version>1.0.0-rc1</version>
     </dependency>
 
     <dependency>
         <groupId>dev.langchain4j</groupId>
         <artifactId>langchain4j-open-ai</artifactId>
-        <version>0.33.0</version>
+        <version>1.0.0-rc1</version>
     </dependency>
    ```
 
@@ -49,11 +49,14 @@ LangChain4j maakt het beginnen met AI in Java zo simpel als de volgende paar sta
 1. Creëer een instantie van het gekozen model in je code, en je kunt al beginnen met chatten! Onderstaande code snippet toont hoe je met twee regels code al met ChatGPT kunt chatten in je app!
 
    ```java
-   ChatLanguageModel model = OpenAiChatModel.withApiKey(yourApiKey);
+   ChatModel model = OpenAiChatModel.builder()
+            .modelName(OpenAiChatModelName.O3_MINI)
+            .apiKey("API_KEY")
+            .build();
 
-   String answer = model.generate("Hello World! Greetings from Info Support!");
+   var answer = model.chat("Hello World! Greetings from Info Support!");
 
-   System.out.println(answer); // Hello Info Support! It's great to connect with you. How are you doing today?
+   System.out.println(answer);
    ```
 
 > [!NOTE]
@@ -61,18 +64,18 @@ LangChain4j maakt het beginnen met AI in Java zo simpel als de volgende paar sta
 > 1. Voeg de Langchain4j dependencies toe aan je project.
 > 1. Maak een test waarin je met bovenstaande code aan ChatGPT vraagt wat hij van het idee van een Info Support Swagshop vindt. Wat is het antwoord?
 
-Gefeliciteerd, je hebt zojuist AI geintergreerd in een software project! We gaan nu een stap verder en daadwerkelijk functionaliteit implementeren waarmee de gebruiker producten kan bestellen in onze webshop.
+Gefeliciteerd, je hebt zojuist AI geïntegreerd in een software project! We gaan nu een stap verder en daadwerkelijk functionaliteit implementeren waarmee de gebruiker producten kan bestellen in onze webshop.
 
 We gaan het bouwen als volgt: we maken een command-line applicatie waarmee de gebruiker vragen kan stellen aan de webshop. Een LLM, zoals ChatGPT, wordt in onze applicatie op twee manieren gebruikt:
 
 1. Antwoord geven op de vraag van de gebruiker in natuurlijke taal.
-2. Intepretatie van het verzoek van de gebruiker om product informatie op te halen of om een product te bestellen.
+2. Interpretatie van het verzoek van de gebruiker om product informatie op te halen of om een product te bestellen.
 
 We gaan eerst een AI-service configureren zodat we AI verder kunnen gebruiken in onze applicatie.
 
-# AI Services
+## Exercise 2: AI Services
 
-Om een LLM breder te gebruiken binnen onze applicatie defineren we een `AI-services`-object. Hiermee kun je de LLM die je gebruikt beginnen uitbereiden met de op maat business logica die nodig is. Denk hierbij aan bijvoorbeeld tools, context grootte, prompt injection. De AI Service beheert deze allemaal op een centrale plaats.
+Om een LLM breder te gebruiken binnen onze applicatie definiëren we een `AI-services`-object. Hiermee kun je de LLM die je gebruikt beginnen uitbreiden met de op maat business logica die nodig is. Denk hierbij aan bijvoorbeeld tools, context grootte, prompt injection. De AI Service beheert deze allemaal op een centrale plaats.
 Dit kan variëren van simpele berekeningen tot complexe data-analyse of communicatie met externe API's.
 
 Hier is een simpel voorbeeld van het gebruik hiervan:
@@ -85,7 +88,7 @@ interface Assistant {
 
 ```java
 AiServices.builder(Assistant.class)
-    .chatLanguageModel(OpenAiChatModel.builder()
+    .chatModel(OpenAiChatModel.builder()
     .apiKey("API_KEY")
     .modelName(OpenAiChatModelName.GPT_4)
     .build())
@@ -109,7 +112,7 @@ AiServices.builder(Assistant.class)
 
 Voor meer informatie over de AI Service, zie de LangChain4j documentatie: https://docs.langchain4j.dev/tutorials/ai-services.
 
-Het AI-services object kunnen we verder configureren door bijvoorbeeld een systemprompt mee te geven;
+Het AI-services object kunnen we verder configureren door bijvoorbeeld een system prompt mee te geven;
 
 ```java
 .systemMessageProvider((var x) -> "Je bent de chatbot voor de Info Support swag shop, een digitale winkel! Houdt antwoorden vriendelijk maar kort")
@@ -134,27 +137,27 @@ String answer = assistant.chat("How many 'R' are in the word Strawberry?");
 <summary>Hoe voeg je een basis CLI interface toe?</summary>
 
 ```java
-Scanner scanner = new Scanner(System.in);
+try (Scanner scanner = new Scanner(System.in)) {
+    System.out.println("Dit is het begin van jouw gesprek met de Info Support swag shop chatbot!");
+    System.out.print("[input]: ");
 
-System.out.println("Dit is het begin van jouw gesprek met de Info Support swag shop chatbot!");
-System.out.print("[input]: ");
+    while (scanner.hasNext()) {
+       String in = scanner.nextLine();
 
-while (scanner.hasNext()) {
-   String in = scanner.nextLine();
-
-   String answer = assistant.chat(in);
-   System.out.println("[output]: " + answer);
-   System.out.println();
-   System.out.print("[input]: ");
+       String answer = assistant.chat(in);
+       System.out.println("[output]: " + answer);
+       System.out.println();
+       System.out.print("[input]: ");
+    }
 }
 ```
 
 </details>
 
-Nu zijn we klaar om eigen business logica te schrijven zodat onze gebruikers producten kunnen bestellen in onze swagshop. Wat we hiervoor nodig hebben is een manier om het verzoek van de gebruik juist te intepreteren.
-Het intepreteren van het verzoek van de gebruiker kunnen met Langchain doen middels `Tools`.
+Nu zijn we klaar om eigen business logica te schrijven zodat onze gebruikers producten kunnen bestellen in onze swagshop. Wat we hiervoor nodig hebben is een manier om het verzoek van de gebruik juist te interpreteren.
+Het interpreteren van het verzoek van de gebruiker kunnen met Langchain doen middels `Tools`.
 
-# Tools (Function Calling)
+## Exercise 3: Tools (Function Calling)
 
 In Langchain4j zijn Tools functies die een AI-agent kan gebruiken om specifieke taken uit te voeren, zoals het ophalen van informatie, berekeningen maken, of interactie met andere systemen. Ze fungeren als uitbreidingen die de mogelijkheden van AI verbreden door toegang te bieden tot externe bronnen of acties. Tools helpen de AI om betere en nuttigere antwoorden te geven door gericht specifieke acties te ondernemen. Door Tools te integreren in een AI-applicatie, kan je de bruikbaarheid en efficiëntie van je AI-oplossing aanzienlijk vergroten.
 
@@ -181,7 +184,7 @@ Het is mogelijk extra context aan het model te geven via de `@P(..)` annotatie o
 
 Voor meer informatie over Tools, zie de LangChain4j documentatie: https://docs.langchain4j.dev/tutorials/tools/.
 
-Om Tools toe te voegen aan onze applicatie definieren we een classe, `KlantTools`. In deze classe implementeren we de functionaliteit die onze swagshop zou moeten ondersteunen. Bijvoorbeeld:
+Om Tools toe te voegen aan onze applicatie definiëren we een class, `KlantTools`. In deze class implementeren we de functionaliteit die onze swagshop zou moeten ondersteunen. Bijvoorbeeld:
 
 ```java
 class KlantTools {
@@ -199,16 +202,18 @@ Vervolgens configureren we onze AI-services om te vertellen van welke tools de A
 ```java
 .tools(new KlantTools())
 ```
+
 > [!IMPORTANT]
 >
 > Voor de volgende opdrachten, vermijdt Method-overloading, het model kan daar niet goed mee overweg.
 
 > [!NOTE]
-> Implementeer functionaliteit in de `KlantTools`-classe. Maak gebruik van de in-memory database zoals geimplementeerd in de `Database`-classe. Je kunt denken aan de volgende functionaliteiten:
+> Implementeer functionaliteit in de `KlantTools`-class. Maak gebruik van de in-memory database zoals geïmplementeerd in de `Database`-class. Je kunt denken aan de volgende functionaliteiten:
+>
 > 1. Aanmaken van een nieuwe klant en het ophalen ervan via naam of id.
 > 2. Haal een product via naam of id op.
 > 3. Maak een nieuwe order aan; gebruik een Customer, Product en quantity als parameters.
-> 4. Update een bestaande order met een extra orderline; gebruik een order ID, Product en quantity als parameters.
+> 4. Update een bestaande order met een extra order-line; gebruik een order ID, Product en quantity als parameters.
 > 5. (Extra): Zorg dat de chatbot de totaalprijs van een bestelling kan teruggeven (incl. 21% btw!).
 >
 > Alle nodige methodes zijn aanwezig, je hoeft enkel de Tools te schrijven.
@@ -217,15 +222,13 @@ Vervolgens configureren we onze AI-services om te vertellen van welke tools de A
 <summary>Benieuwd wat LangChain4j onderwater aan het doen is?</summary>
 
 Je kunt de berichten die LangChain4j lokaal heen en weer stuurt met het model inzichtelijk krijgen door:
-- In ```simplelogger.properties``` bestand loglevel op ```debug``` te zetten.
-- In ```Configuration.java``` bij het aanmaken van het model, ```logRequests(..)``` en/of ```logResponses(..)``` op true te zetten.
+
+- In `simplelogger.properties` bestand loglevel op `debug` te zetten.
+- In `Configuration.java` bij het aanmaken van het model, `logRequests(..)` en/of `logResponses(..)` op true te zetten.
 
 </details>
 
-
-
-
-# Retrieval Augmented Generation (RAG)
+## Exercise 4: Retrieval Augmented Generation (RAG)
 
 RAG is een combinatie van verschillende technieken om LLM's te voorzien van domein specifieke kennis of particuliere data. Door relevante informatie uit lokale bronnen mee te sturen in de prompt, kan de LLM deze extra informatie gebruiken om een antwoord te formuleren.
 
@@ -245,43 +248,36 @@ EasyRAG komt als een aparte dependency en is bedoeld om je snel met RAG te laten
 <dependency>
    <groupId>dev.langchain4j</groupId>
    <artifactId>langchain4j-easy-rag</artifactId>
-   <version>0.33.0</version>
+   <version>1.0.0-beta4</version>
 </dependency>
 ```
 
 > [!NOTE]
-> 
+>
 > Voeg de LangChain4j EasyRAG dependency toe aan het project
 
 Om aan de slag te gaan met EasyRAG moet de Assistant met de volgende onderdelen uitgebreid worden:
 
 1. Het laden van je documenten:
-
-```java
-List<Document> documents = FileSystemDocumentLoader.loadDocuments("/path/to/files");
-```
-
+   ```java
+   List<Document> documents = FileSystemDocumentLoader.loadDocuments("/path/to/files", new TextDocumentParser());
+   ```
+   De bestanden staan in `src/main/resources/documents/`.
 2. Het aanmaken van een embedding store en het vullen ervan:
-
-```java
-InMemoryEmbeddingStore<TextSegment> embeddingStore = new InMemoryEmbeddingStore<>();
-EmbeddingStoreIngestor.ingest(documents, embeddingStore);
-```
-
+   ```java
+   InMemoryEmbeddingStore<TextSegment> embeddingStore = new InMemoryEmbeddingStore<>();
+   EmbeddingStoreIngestor.ingest(documents, embeddingStore);
+   ```
 3. Je AIService uitbreiden met de embedding store:
-
-```java
-.contentRetriever(EmbeddingStoreContentRetriever.from(embeddingStore))
-```
-
-> [!IMPORTANT]
-> 
-> Zet je Tools voor de volgende opdracht tijdelijk uit omdat beide Tools en RAG met producten werken, en dat kan de resultaten van het model negatief beïnvloeden.
+   ```java
+   .contentRetriever(EmbeddingStoreContentRetriever.from(embeddingStore))
+   ```
 
 > [!NOTE]
-> 
+>
 > In de resources directory hebben we tekst bestanden met beschrijvingen en informatie over de voorwerpen.
 > Voer de bovenstaande drie stappen uit om jouw chatbot RAG mogelijkheden te geven:
+>
 > 1. Laden van documenten
 > 2. Aanmaken embedding store
 > 3. AI Service uitbreiden met embedding store
@@ -290,28 +286,27 @@ EmbeddingStoreIngestor.ingest(documents, embeddingStore);
 >
 > - **Vraag**: Wat is de prijs van een hoodie?
 > - **Antwoord**: 45 euro.
-> 
-> 
+>
 > - **Vraag**: Waar kan ik de gratis poster ophalen?
 > - **Antwoord**: bij binnenkomst, bij de balie.
-> 
-> 
+>
 > - **Vraag**: Hoe kom ik aan een gouden sleutelhanger?
 > - **Antwoord**: alleen op verzoek
-> 
-> 
+>
 > - **Vraag**: Welke maten t-shirts zijn nog beschikbaar?
 > - **Antwoord**: Alles van XS t/m XXL, met uitzondering van L.
-> 
-> 
+>
 > - **Vraag**: Hoeveel kost de 16 TB USB-stick?
 > - **Antwoord**: 160 euro
 
 Je kunt de nodige stappen voor EasyRAG hier teruglezen: https://docs.langchain4j.dev/tutorials/rag#easy-rag
 
-# Extra: Image Generation
+## Extra: Image Generation
+
 Het is nu ook mogelijk om beelden te genereren via ChatGPT 4, en dat kun je hier direct via code doen. Probeer het eens uit en ontdek wat je ermee kunt maken. Deze functionaliteit is ook geïntegreerd in LangChain4j.
 
->Tip: In ChatGPT kun je gewoon een prompt invoeren om een beeld te genereren, net zoals je dat doet voor tekst. Achter de schermen werkt dit echter met een compleet ander model.
+Zie [OpenAiImageModelExamples.java](https://github.com/langchain4j/langchain4j-examples/blob/main/open-ai-examples/src/main/java/OpenAiImageModelExamples.java)
 
->Let op: Dit kan behoorlijk veel tokens verbruiken, dus ongeremd gebruik kan snel prijzig worden.
+> Tip: In ChatGPT kun je gewoon een prompt invoeren om een beeld te genereren, net zoals je dat doet voor tekst. Achter de schermen werkt dit echter met een compleet ander model.
+
+> Let op: Dit kan behoorlijk veel tokens verbruiken, dus ongeremd gebruik kan snel prijzig worden.
