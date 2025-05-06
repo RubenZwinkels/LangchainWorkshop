@@ -15,6 +15,7 @@ public class Configuration {
                         .modelName(OpenAiChatModelName.GPT_4_O)
                         .build())
                 .chatMemory(MessageWindowChatMemory.withMaxMessages(10))
+                .systemMessageProvider((var x) -> "Je bent de chatbot voor de Info Support swag shop, een digitale winkel! Houdt antwoorden vriendelijk maar kort en je antwoord in het nederlands")
                 .build();
     }
 }
