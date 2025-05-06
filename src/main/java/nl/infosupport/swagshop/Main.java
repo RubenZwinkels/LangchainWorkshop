@@ -9,11 +9,11 @@ import java.util.Scanner;
 
 public class Main {
     public static void main(String[] args) {
-        ChatModel model = OpenAiChatModel.builder()
-                .modelName(OpenAiChatModelName.GPT_4_O)
 
-                .apiKey("")
-                .build();
+        Assistant assistant = Configuration.assistant();
+        String answer = assistant.chat("How many 'R' are in the word Strawberry?");
+
+        System.out.println(answer);
 
         Scanner scanner = new Scanner(System.in);
 
@@ -22,8 +22,8 @@ public class Main {
             String input = scanner.nextLine();
             if (input.equalsIgnoreCase("exit")) break;
 
-            var answer = model.chat(input);
-            System.out.println("Bot: " + answer);
+            var answer2 = assistant.chat(input);
+            System.out.println("Bot: " + answer2);
         }
 
         scanner.close();
