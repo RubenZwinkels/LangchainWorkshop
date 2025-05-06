@@ -10,7 +10,8 @@ import java.util.Scanner;
 public class Main {
     public static void main(String[] args) {
         ChatModel model = OpenAiChatModel.builder()
-                .modelName(OpenAiChatModelName.O3_MINI)
+                .modelName(OpenAiChatModelName.GPT_4_O)
+
                 .apiKey("")
                 .build();
 
